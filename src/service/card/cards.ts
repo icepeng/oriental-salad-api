@@ -27,6 +27,16 @@ export const CARD_LIST: Card[] = [
       'https://assets.webn.mobi/hearthstone/88958534ac9ee18981bbc56435e6de24b21defaffeac4d3938b24acd5c66aef0.png',
   },
   {
+    code: "Dragon's Fury",
+    name: '용의 분노',
+    type: 'Spell',
+    class: 'Mage',
+    cost: 5,
+    rarity: 'Epic',
+    imgLink:
+      'https://assets.webn.mobi/hearthstone/56cf85636ebb73c3a25ec59150225b709507569cde7cdc9f7d88643d6035f85e.png',
+  },
+  {
     code: 'Deck_of_Wonders',
     name: '신비의 덱',
     type: 'Spell',
@@ -115,6 +125,16 @@ export const CARD_LIST: Card[] = [
       'https://assets.webn.mobi/hearthstone/ccb592aaae0827170509d42fa1159808d5c4b5d3b23fcf2c879b0b57f3be2493.png',
   },
   {
+    code: 'To_My_Side',
+    name: '이리 와라!',
+    type: 'Spell',
+    class: 'Hunter',
+    cost: 6,
+    rarity: 'Epic',
+    imgLink:
+      'https://assets.webn.mobi/hearthstone/8cd9a37c82a1beb7b1af8c49b7d9f671aca4a7942095b238ab4198b4b26126d1.png',
+  },
+  {
     code: 'Lesser_Emerald_Spellstone',
     name: '하급 에메랄드 주문석',
     type: 'Spell',
@@ -157,6 +177,18 @@ export const CARD_LIST: Card[] = [
     rarity: 'Legendary',
     imgLink:
       'https://assets.webn.mobi/hearthstone/0478890053bcd65f9ec883c1697906396a717695d55bf23d8394b8ba7f27f3f4.png',
+  },
+  {
+    code: 'Kingsbane',
+    name: '왕의 파멸',
+    type: 'Weapon',
+    class: 'Rogue',
+    cost: 3,
+    attack: 1,
+    durability: 3,
+    rarity: 'Legendary',
+    imgLink:
+      'https://assets.webn.mobi/hearthstone/d505eed494b3c830229166dcffee704d8b4e95a57f1fb0874d49fb9eeb85a976.png',
   },
   {
     code: 'Evasion',
@@ -255,6 +287,18 @@ export const CARD_LIST: Card[] = [
     rarity: 'Epic',
     imgLink:
       'https://assets.webn.mobi/hearthstone/f5fcbbbb651fc011660c816c8483e309bce83b0d8e2241ff7c7e63a5a93035d0.png',
+  },
+  {
+    code: 'Bladed_Gauntlet',
+    name: '칼날주먹',
+    type: 'Weapon',
+    class: 'Warrior',
+    cost: 2,
+    attack: 0,
+    durability: 2,
+    rarity: 'Epic',
+    imgLink:
+      'https://assets.webn.mobi/hearthstone/17fb9767ed596636bfff662925f466c403f8a76c6fe7dc740f588e8bdb610af6.png',
   },
   {
     code: 'Lesser_Mithrill_Spellstone',
