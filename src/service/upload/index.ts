@@ -1,7 +1,7 @@
-import { JudgeEntity, UploadEntity } from '@core';
 import { Service } from 'typedi';
 import { EntityManager } from 'typeorm';
 
+import { JudgeEntity, UploadEntity } from '../../core';
 import { NotFoundError } from '../error';
 import { toJudgeEntity, toUpload, toUploadEntity, Upload } from './dto';
 

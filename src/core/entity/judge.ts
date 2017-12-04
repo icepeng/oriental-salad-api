@@ -1,4 +1,3 @@
-import { CardEntity, UploadEntity } from '@core';
 import {
   Column,
   CreateDateColumn,
@@ -7,6 +6,9 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
+import { CardEntity } from './card';
+import { UploadEntity } from './upload';
 
 @Entity('judge')
 export class JudgeEntity {

@@ -15,14 +15,7 @@
     "experimentalDecorators": true,
     "sourceMap": true,
     "noUnusedLocals": true,
-    "baseUrl": "src",
-    "paths": {
-      "@service": ["service"],
-      "@service/*": ["service/*"],
-      "@config": ["config"],
-      "@config/*": ["config/*"],
-      "@core": ["core"]
-    }
+    "baseUrl": "src"
   },
   "filesGlob": ["src/**/*.ts"],
   "include": ["src/**/*.ts"],

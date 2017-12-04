@@ -1,4 +1,3 @@
-import { JudgeEntity } from '@core';
 import {
   Column,
   CreateDateColumn,
@@ -6,6 +5,8 @@ import {
   OneToMany,
   PrimaryColumn,
 } from 'typeorm';
+
+import { JudgeEntity } from './judge';
 
 @Entity('card')
 export class CardEntity {

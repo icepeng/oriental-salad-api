@@ -1,7 +1,7 @@
-import { CardService } from '@service';
 import { Inject, Service } from 'typedi';
 import { EntityManager } from 'typeorm';
 
+import { CardService } from '../../../service';
 import { Request, Response } from '../../yoshi';
 
 @Service()

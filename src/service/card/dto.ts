@@ -1,4 +1,4 @@
-import { CardEntity } from '@core';
+import { CardEntity } from '../../core';
 
 export type Classes =
   | 'Mage'

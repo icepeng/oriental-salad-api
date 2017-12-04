@@ -1,8 +1,8 @@
-import { UploadService } from '@service';
-import { NotFoundError } from '@service/error';
 import { Inject, Service } from 'typedi';
 import { EntityManager } from 'typeorm';
 
+import { UploadService } from '../../../service';
+import { NotFoundError } from '../../../service/error';
 import { Request, Response } from '../../yoshi';
 import { idValidator, uploadValidator } from './validator';
 
