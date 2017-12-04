@@ -4,15 +4,33 @@ import { LANG_KO } from '../../util/joi';
 
 export interface UploadInput {
   name: string;
-  judges: any;
+  judges: JudgeInput[];
 }
 
-export function accountValidator(body: any): Validation<UploadInput> {
+export interface JudgeInput {
+  value: number;
+  potential: number;
+  description: string;
+  cardCode: string;
+}
+
+export function uploadValidator(body: any): Validation<UploadInput> {
   const schema = Joi.object().keys({
     name: Joi.string()
       .max(255)
       .required(),
-    judges: Joi.any(),
+    judges: Joi.array()
+      .items(
+        Joi.object()
+          .keys({
+            value: Joi.number().required(),
+            potential: Joi.number().required(),
+            description: Joi.string().allow('').default(''),
+            cardCode: Joi.string().required(),
+          })
+          .required(),
+      )
+      .required(),
   });
 
   return Joi.validate(body, schema, { language: LANG_KO });

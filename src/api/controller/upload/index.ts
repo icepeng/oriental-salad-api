@@ -4,7 +4,7 @@ import { Inject, Service } from 'typedi';
 import { EntityManager } from 'typeorm';
 
 import { Request, Response } from '../../yoshi';
-import { accountValidator } from './validator';
+import { uploadValidator } from './validator';
 
 @Service()
 export class UploadController {
@@ -16,7 +16,7 @@ export class UploadController {
       const item = await this.uploadService.getOne(tx, +params.id);
 
       return res.ok({
-        account: item,
+        upload: item,
       });
     } catch (err) {
       if (err instanceof NotFoundError) {
@@ -29,7 +29,7 @@ export class UploadController {
   };
 
   add = async ({ body }: Request, res: Response, tx: EntityManager) => {
-    const { error, value } = accountValidator(body);
+    const { error, value } = uploadValidator(body);
     if (error) {
       return res.badRequest({
         message: error.message,
