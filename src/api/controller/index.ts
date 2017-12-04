@@ -7,3 +7,4 @@ export interface Validation<T> {
 
 // export controllers here
 export * from './upload';
+export * from './card';
