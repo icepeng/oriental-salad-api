@@ -9,7 +9,7 @@ import { toJudgeEntity, toUpload, toUploadEntity, Upload } from './dto';
 export class UploadService {
   public async getOne(
     entityManager: EntityManager,
-    id: number,
+    id: string,
   ): Promise<Upload> {
     const upload = <{
       judges: JudgeEntity[];
@@ -25,7 +25,7 @@ export class UploadService {
   public async create(
     entityManager: EntityManager,
     upload: Upload,
-  ): Promise<number> {
+  ): Promise<string> {
     const uploadEntity = toUploadEntity(upload);
     const createdUpload = await entityManager
       .getRepository(UploadEntity)

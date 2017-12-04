@@ -35,3 +35,8 @@ export function uploadValidator(body: any): Validation<UploadInput> {
 
   return Joi.validate(body, schema, { language: LANG_KO });
 }
+
+export function idValidator(id: string): Validation<string> {
+  const schema = Joi.string().uuid();
+  return Joi.validate(id, schema, { language: LANG_KO });
+}

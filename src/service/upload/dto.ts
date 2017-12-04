@@ -20,7 +20,7 @@ export function toJudge(judge: JudgeEntity): Judge {
   };
 }
 
-export function toJudgeEntity(judge: Judge, uploadId: number): JudgeEntity {
+export function toJudgeEntity(judge: Judge, uploadId: string): JudgeEntity {
   return {
     uploadId,
     id: <any>undefined,

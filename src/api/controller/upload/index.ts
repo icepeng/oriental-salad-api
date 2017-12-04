@@ -4,15 +4,22 @@ import { Inject, Service } from 'typedi';
 import { EntityManager } from 'typeorm';
 
 import { Request, Response } from '../../yoshi';
-import { uploadValidator } from './validator';
+import { idValidator, uploadValidator } from './validator';
 
 @Service()
 export class UploadController {
   @Inject() uploadService: UploadService;
 
   getOne = async ({ params }: Request, res: Response, tx: EntityManager) => {
+    const { error, value: uploadId } = idValidator(params.id);
+    if (error) {
+      return res.badRequest({
+        message: error.message,
+      });
+    }
+
     try {
-      const item = await this.uploadService.getOne(tx, +params.id);
+      const item = await this.uploadService.getOne(tx, uploadId);
 
       return res.ok({
         upload: item,

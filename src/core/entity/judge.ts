@@ -20,7 +20,7 @@ export class JudgeEntity {
 
   @Column('text') description: string;
 
-  @Column('int') uploadId: number;
+  @Column() uploadId: string;
 
   @ManyToOne(type => UploadEntity, upload => upload.judges)
   @JoinColumn({ name: 'uploadId' })

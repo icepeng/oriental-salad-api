@@ -9,7 +9,7 @@ import {
 
 @Entity('upload')
 export class UploadEntity {
-  @PrimaryGeneratedColumn('uuid') id: number;
+  @PrimaryGeneratedColumn('uuid') id: string;
 
   @CreateDateColumn() createTime: Date;
 
