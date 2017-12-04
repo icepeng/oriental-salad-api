@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "start": "npm run build:live",
+    "build": "./node_modules/.bin/tsc",
     "build:live": "nodemon --exec ./node_modules/.bin/ts-node -r tsconfig-paths/register -- ./src/index.ts",
+    "build:dry": "./node_modules/.bin/tsc --noEmit",
     "test": "mocha --opts test/mocha.opts",
     "test:coverage": "export PATH=$(pwd)/node_modules/.bin:$PATH; nyc --require ts-node/register _mocha --opts test/mocha.opts",
     "lint": "tslint -p tsconfig.json \"src/**/*.ts\" --exclude \"src/**/*.spec.ts\"",
     "lint:fix": "tslint \"src/**/*.ts\" --fix",
-    "format": "find src -name '*.ts' | xargs ./node_modules/.bin/prettier --write --print-width 80 --single-quote --trailing-comma all",
-    "build:dry": "./node_modules/.bin/tsc --noEmit"
+    "format": "find src -name '*.ts' | xargs ./node_modules/.bin/prettier --write --print-width 80 --single-quote --trailing-comma all"
   },
   "nyc": {
     "include": [
