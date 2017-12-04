@@ -13,7 +13,7 @@ export class UploadEntity {
 
   @CreateDateColumn() createTime: Date;
 
-  @Column() name: string;
+  @Column('text') name: string;
 
   @OneToMany(type => JudgeEntity, judge => judge.upload)
   judges?: JudgeEntity[];

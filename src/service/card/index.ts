@@ -3,12 +3,13 @@ import { Service } from 'typedi';
 import { EntityManager } from 'typeorm';
 
 import { NotFoundError } from '../error';
-import { Card } from './dto';
+import { Card, toCard, toCardEntity } from './dto';
 
 @Service()
 export class CardService {
   public async getAll(entityManager: EntityManager): Promise<Card[]> {
-    return entityManager.getRepository(CardEntity).find();
+    const cards = await entityManager.getRepository(CardEntity).find();
+    return cards.map(card => toCard(card));
   }
 
   public async getOne(entityManager: EntityManager, id: number): Promise<Card> {
@@ -16,7 +17,7 @@ export class CardService {
     if (!card) {
       throw new NotFoundError();
     }
-    return card;
+    return toCard(card);
   }
 
   public async create(
@@ -24,9 +25,10 @@ export class CardService {
     card: Card,
     organizationId: number,
   ): Promise<number> {
+    const cardEntity = toCardEntity(card);
     const createdEntity = await entityManager
       .getRepository(CardEntity)
-      .save(card);
+      .save(cardEntity);
 
     return createdEntity.id;
   }

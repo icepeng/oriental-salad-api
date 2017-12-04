@@ -1,5 +1,6 @@
-import { UploadEntity } from '@core';
+import { CardEntity, UploadEntity } from '@core';
 import {
+  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -13,7 +14,21 @@ export class JudgeEntity {
 
   @CreateDateColumn() createTime: Date;
 
+  @Column() value: number;
+
+  @Column() potential: number;
+
+  @Column('text') description: string;
+
+  @Column('int') uploadId: number;
+
   @ManyToOne(type => UploadEntity, upload => upload.judges)
-  @JoinColumn()
+  @JoinColumn({ name: 'uploadId' })
   upload?: UploadEntity;
+
+  @Column('int') cardId: number;
+
+  @ManyToOne(type => CardEntity, card => card.judges)
+  @JoinColumn({ name: 'cardId' })
+  card?: CardEntity;
 }

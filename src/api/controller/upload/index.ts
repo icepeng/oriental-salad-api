@@ -10,11 +10,7 @@ import { accountValidator } from './validator';
 export class UploadController {
   @Inject() uploadService: UploadService;
 
-  getOne = async (
-    { params, user }: Request,
-    res: Response,
-    tx: EntityManager,
-  ) => {
+  getOne = async ({ params }: Request, res: Response, tx: EntityManager) => {
     try {
       const item = await this.uploadService.getOne(tx, +params.id);
 
@@ -31,15 +27,15 @@ export class UploadController {
     }
   };
 
-  add = async ({ body, user }: Request, res: Response, tx: EntityManager) => {
-    const { error } = accountValidator(body);
+  add = async ({ body }: Request, res: Response, tx: EntityManager) => {
+    const { error, value } = accountValidator(body);
     if (error) {
       return res.badRequest({
         message: error.message,
       });
     }
 
-    await this.uploadService.create(tx, body);
-    return res.ok();
+    const id = await this.uploadService.create(tx, value);
+    return res.ok({ id });
   };
 }

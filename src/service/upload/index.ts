@@ -1,37 +1,41 @@
-import { UploadEntity } from '@core';
+import { JudgeEntity, UploadEntity } from '@core';
 import { Service } from 'typedi';
 import { EntityManager } from 'typeorm';
 
 import { NotFoundError } from '../error';
-import { Upload } from './dto';
+import { toJudgeEntity, toUpload, toUploadEntity, Upload } from './dto';
 
 @Service()
 export class UploadService {
-  public async getAll(entityManager: EntityManager): Promise<Upload[]> {
-    return entityManager.getRepository(UploadEntity).find();
-  }
-
   public async getOne(
     entityManager: EntityManager,
     id: number,
   ): Promise<Upload> {
-    const upload = await entityManager
+    const upload = <{
+      judges: JudgeEntity[];
+    } & UploadEntity>await entityManager
       .getRepository(UploadEntity)
-      .findOne({ id });
+      .findOne({ id }, { relations: ['judges'] });
     if (!upload) {
       throw new NotFoundError();
     }
-    return upload;
+    return toUpload(upload);
   }
 
   public async create(
     entityManager: EntityManager,
     upload: Upload,
   ): Promise<number> {
-    const createdEntity = await entityManager
+    const uploadEntity = toUploadEntity(upload);
+    const createdUpload = await entityManager
       .getRepository(UploadEntity)
-      .save(upload);
+      .save(uploadEntity);
 
-    return createdEntity.id;
+    const judgeEntities = upload.judges.map(item =>
+      toJudgeEntity(item, createdUpload.id),
+    );
+    await entityManager.getRepository(JudgeEntity).save(judgeEntities);
+
+    return createdUpload.id;
   }
 }
