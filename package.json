@@ -1,0 +1,77 @@
+{
+  "name": "oriental-salad-api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm run build:live",
+    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -r tsconfig-paths/register -- ./src/index.ts",
+    "test": "mocha --opts test/mocha.opts",
+    "test:coverage": "export PATH=$(pwd)/node_modules/.bin:$PATH; nyc --require ts-node/register _mocha --opts test/mocha.opts",
+    "lint": "tslint -p tsconfig.json \"src/**/*.ts\" --exclude \"src/**/*.spec.ts\"",
+    "lint:fix": "tslint \"src/**/*.ts\" --fix",
+    "format": "find src -name '*.ts' | xargs ./node_modules/.bin/prettier --write --print-width 80 --single-quote --trailing-comma all",
+    "build:dry": "./node_modules/.bin/tsc --noEmit"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "node_modules/",
+      "dist/",
+      "src/**/*.spec.ts",
+      "src/**/test/"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text",
+      "text-summary",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  },
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cors": "^2.8.3",
+    "debug": "^3.1.0",
+    "express": "^4.14.0",
+    "joi": "^13.0.1",
+    "morgan": "^1.7.0",
+    "pg": "^7.3.0",
+    "reflect-metadata": "^0.1.10",
+    "typedi": "^0.5.2",
+    "typeorm": "^0.2.0-alpha.10"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.16.7",
+    "@types/chai": "^4.0.4",
+    "@types/cors": "^2.8.1",
+    "@types/debug": "0.0.30",
+    "@types/express": "^4.0.39",
+    "@types/joi": "^13.0.0",
+    "@types/mocha": "^2.2.44",
+    "@types/morgan": "^1.7.35",
+    "@types/node": "^8.0.47",
+    "@types/pg": "^7.1.5",
+    "@types/winston": "^2.3.7",
+    "chai": "^4.1.2",
+    "istanbul": "^0.4.5",
+    "mocha": "^4.0.1",
+    "node-mocks-http": "^1.6.1",
+    "nodemon": "^1.11.0",
+    "nyc": "^11.3.0",
+    "prettier": "^1.8.1",
+    "ts-node": "^3.0.2",
+    "tsconfig-paths": "^2.3.0",
+    "tslint": "^5.8.0",
+    "tslint-consistent-codestyle": "^1.6.0",
+    "typescript": "^2.6.1",
+    "winston": "^2.3.1"
+  }
+}

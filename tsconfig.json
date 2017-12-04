@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": true,
+    "outDir": "dist",
+    "lib": ["es2017"],
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": true,
+    "typeRoots": ["node_modules/@types"],
+    "noImplicitReturns": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "baseUrl": "src",
+    "paths": {
+      "@service": ["service"],
+      "@service/*": ["service/*"],
+      "@config": ["config"],
+      "@config/*": ["config/*"],
+      "@core": ["core"]
+    }
+  },
+  "filesGlob": ["src/**/*.ts"],
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts"]
+}

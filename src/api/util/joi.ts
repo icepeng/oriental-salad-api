@@ -1,0 +1,128 @@
+import { LanguageRootOptions } from 'joi';
+
+export const LANG_KO: LanguageRootOptions = {
+  root: 'value',
+  key: '{{label}}',
+  messages: { wrapArrays: false },
+  any: {
+    unknown: '의 값은 허용되지 않습니다.',
+    invalid: '에 잘못된 값이 들어 있습니다.',
+    empty: '의 값을 입력해야 합니다.',
+    required: '의 값이 필요합니다.',
+    allowOnly: '의 값은 {{valids}} 중 하나여야 합니다.',
+    default: '',
+  },
+  alternatives: { base: '', child: null },
+  array: {
+    base: '의 값은 여러개여야 합니다.',
+    includes: '의 {{pos}}번째 위치의 값이 적절하지 않습니다.',
+    includesSingle: '에 있는 "{{label}}"의 값이 적절하지 않습니다.',
+    includesOne: '의 {{pos}}번째 {{reason}}',
+    // 이 아래 부분은 사용되지 않기 때문에 임시로 미번역 상태
+    includesOneSingle:
+      '{{reason}} 때문에 "{{label}}"의 값은 허용되지 않습니다.',
+    includesRequiredUnknowns: '{{unknownMisses}} 필수 값을 포함하지 않습니다.',
+    includesRequiredKnowns: '{{knownMisses}}을 (를) 포함하지 않습니다.',
+    includesRequiredBoth:
+      '{{knownMisses}} 및 {{unknownMisses}} 다른 필수 값을 포함하지 않습니다.',
+    excludes: '위치 {{pos}}에 제외 된 값이 있습니다.',
+    excludesSingle: '"{{label}}"의 단일 값에는 제외 된 값이 들어 있습니다.',
+    // 사용되지 않는 부분 끝
+    min: '에는 최소 {{limit}}개의 값을 포함해야 합니다.',
+    max: '에는 {{limit}}개 이하의 값을 포함해야 합니다.',
+    length: '에는 {{limit}}개의 값을 포함해야 합니다.',
+    ordered: '{{reason}}',
+    orderedLength:
+      '에는 최대 {{limit}}개의 값을 포함해야 하므로 {{pos}}번째 값은 허용되지 않습니다.',
+    ref: '',
+    sparse: '',
+    unique: '의 {{pos}}번째 위치에 중복된 값이 ​​있습니다.',
+  },
+  boolean: { base: '' },
+  date: {
+    base: '의 값은 유효한 날짜여야 합니다.',
+    format: '의 값은 {{format}} 형식의 문자여야 합니다.',
+    strict: '의 값은 유효한 날짜여야 합니다.',
+    min: '의 값은 "{{limit}}"보다 크거나 같아야 합니다.',
+    max: '의 값은 "{{limit}}"보다 작거나 같아야 합니다.',
+    isoDate: '의 값은 유효한 날짜여야 합니다.',
+    timestamp: {
+      javascript: '의 값은 유효한 시간이여야 합니다.',
+      unix: '의 값은 유효한 시간이여야 합니다.',
+    },
+    ref: '{{ref}}',
+  },
+  object: {
+    base: '객체 여야합니다.',
+    child: '!!{{reason}}',
+    min: '적어도 {{limit}} 명의 자녀가 있어야합니다.',
+    max: '{{limit}} 이하이어야합니다.',
+    length: '{{limit}} 어린이가 있어야합니다.',
+    allowUnknown: '!!"{{child}}"는 허용되지 않습니다.',
+    with: '!!"{{mainWithLabel}}"필수 피어 누락 {{{peerWithLabel}} "',
+    without: '!!"{{mainWithLabel}}"금지 된 피어와 충돌 "{{peerWithLabel}}"',
+    missing: '{{peersWithLabels}} 중 하나 이상을 포함해야합니다.',
+    xor: '독점적 인 동료 {{peersWithLabels}} 사이에 충돌이 있습니다.',
+    or: '{{peersWithLabels}} 중 하나 이상을 포함해야합니다.',
+    and:
+      '필수 피어가없는 {{presentWithLabels}}을 (를) 포함합니다 {{missingWithLabels}}',
+    nand:
+      '!!"{{mainWithLabel}}"은 {{peersWithLabels}와 (과) 동시에 존재해서는 안됩니다.',
+    assert:
+      '!!"{{ref}}"{{message}}에 실패했기 때문에 "{{ref}}"인증에 실패했습니다.',
+    rename: {
+      multiple:
+        '여러 개의 이름 바꾸기가 비활성화되어 있고 다른 키가 이미 "{{to}}"로 이름이 바뀌었기 때문에 "{{from}}"자식의 이름을 바꿀 수 없습니다',
+      override:
+        '재정의가 비활성화되어 있고 대상 "{{to}}"이 (가) 존재하기 때문에 자식 {{from}}의 이름을 바꿀 수 없습니다.',
+    },
+    type: '"{{type}}"의 인스턴스 여야합니다.',
+    schema: 'Joi 인스턴스 여야합니다.',
+  },
+  number: {
+    base: '의 값은 숫자여야 합니다.',
+    min: '의 값은 {{limit}}보다 크거나 같아야 합니다.',
+    max: '의 값은 {{limit}}보다 작거나 같아야 합니다.',
+    less: '의 값은 {{limit}}보다 작아야 합니다.',
+    greater: '의 값은 {{limit}}보다 커야 합니다.',
+    float: '의 값은 소수여야 합니다.',
+    integer: '의 값은 정수여야 합니다.',
+    negative: '의 값은 음수여야 합니다.',
+    positive: '의 값은 양수여야 합니다.',
+    precision: '의 소수 자릿수가 {{limit}}자 이상이어야 합니다.',
+    ref: '{{ref}}',
+    multiple: '의 값은 {{multiple}}의 배수여야 합니다.',
+  },
+  string: {
+    base: '의 값은 문자여야 합니다.',
+    min: '의 길이는 최소 {{limit}}자 이상이어야 합니다.',
+    max: '의 길이는 {{limit}}자보다 짧거나 같아야 합니다.',
+    length: '의 길이는 {{limit}}자여야 합니다.',
+    alphanum: '에는 영어와 숫자만 들어 있어야 합니다.',
+    token: '에는 영어와 숫자와 밑줄만 들어 있어야 합니다.',
+    regex: {
+      base: '의 값 "{{!value}}"에 오류가 있습니다.',
+      name: '의 값 "{{!value}}"에 오류가 있습니다.',
+      invert: {
+        base: '의 값 "{{!value}}"에 오류가 있습니다.',
+        name: '의 값 "{{!value}}"에 오류가 있습니다.',
+      },
+    },
+    email: ' 입력 란에는 유효한 이메일을 입력해야 합니다.',
+    uri: '의 값은 유효한 주소여야 합니다.',
+    uriRelativeOnly: '의 값은 유효한 주소여야 합니다.',
+    uriCustomScheme: '의 값은 {{scheme}} 패턴과 일치하는 주소여야 합니다.',
+    isoDate: '의 값은 유효한 날짜여야 합니다.',
+    guid: '유효한 GUID 여야합니다.',
+    hex: '16 진수 만 포함해야합니다.',
+    base64: '의 값은 유효한 문자여야 합니다.',
+    hostname: '의 값은 올바른 이름이여야 합니다.',
+    lowercase: '의 값에는 영어 소문자만 포함해야 합니다.',
+    uppercase: '의 값에는 영어 대문자만 포함해야 합니다.',
+    trim: '의 앞 또는 뒤에는 공백이 없어야 합니다.',
+    creditCard: '의 값은 신용카드 번호여야 합니다.',
+    ref: '{{ref}}',
+    ip: '{{cidr}}의 값은 유효한 주소여야 합니다.',
+    ipVersion: '{{cidr}}의 값은 {{version}} 버전의 유효한 주소여야 합니다.',
+  },
+};
