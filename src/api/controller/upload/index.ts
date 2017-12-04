@@ -1,4 +1,4 @@
-import { UploadService } from '@service';
+import { CardService, UploadService } from '@service';
 import { NotFoundError } from '@service/error';
 import { Inject, Service } from 'typedi';
 import { EntityManager } from 'typeorm';
@@ -9,6 +9,7 @@ import { accountValidator } from './validator';
 @Service()
 export class UploadController {
   @Inject() uploadService: UploadService;
+  @Inject() cardService: CardService;
 
   getOne = async ({ params }: Request, res: Response, tx: EntityManager) => {
     try {
@@ -37,5 +38,10 @@ export class UploadController {
 
     const id = await this.uploadService.create(tx, value);
     return res.ok({ id });
+  };
+
+  init = async ({  }: Request, res: Response, tx: EntityManager) => {
+    await this.cardService.init(tx);
+    return res.ok();
   };
 }

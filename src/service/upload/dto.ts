@@ -8,7 +8,7 @@ export interface Judge {
   value: number;
   potential: number;
   description: string;
-  cardId: number;
+  cardCode: string;
 }
 
 export function toJudge(judge: JudgeEntity): Judge {
@@ -16,7 +16,7 @@ export function toJudge(judge: JudgeEntity): Judge {
     value: judge.value,
     potential: judge.potential,
     description: judge.description,
-    cardId: judge.cardId,
+    cardCode: judge.cardCode,
   };
 }
 
@@ -28,7 +28,7 @@ export function toJudgeEntity(judge: Judge, uploadId: number): JudgeEntity {
     value: judge.value,
     potential: judge.potential,
     description: judge.description,
-    cardId: judge.cardId,
+    cardCode: judge.cardCode,
   };
 }
 

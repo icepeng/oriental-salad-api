@@ -48,12 +48,11 @@ export interface Minion extends CardBase {
 
 export type Card = Minion | Spell | Weapon | Hero;
 
-export function toMinion(card: CardEntity): { id: number } & Minion {
+export function toMinion(card: CardEntity): Minion {
   if (!card.health || !card.attack) {
     throw new Error('Not Minion');
   }
   return {
-    id: card.id,
     type: 'Minion',
     code: card.code,
     name: card.name,
@@ -66,12 +65,11 @@ export function toMinion(card: CardEntity): { id: number } & Minion {
   };
 }
 
-export function toSpell(card: CardEntity): { id: number } & Spell {
+export function toSpell(card: CardEntity): Spell {
   if (!card.health || !card.attack || card.class === 'Neutral') {
     throw new Error('Not Spell');
   }
   return {
-    id: card.id,
     type: 'Spell',
     code: card.code,
     name: card.name,
@@ -82,12 +80,11 @@ export function toSpell(card: CardEntity): { id: number } & Spell {
   };
 }
 
-export function toWeapon(card: CardEntity): { id: number } & Weapon {
+export function toWeapon(card: CardEntity): Weapon {
   if (!card.durability || !card.attack || card.class === 'Neutral') {
     throw new Error('Not Weapon');
   }
   return {
-    id: card.id,
     type: 'Weapon',
     code: card.code,
     name: card.name,
@@ -100,12 +97,11 @@ export function toWeapon(card: CardEntity): { id: number } & Weapon {
   };
 }
 
-export function toHero(card: CardEntity): { id: number } & Hero {
+export function toHero(card: CardEntity): Hero {
   if (card.class === 'Neutral') {
     throw new Error('Not Hero');
   }
   return {
-    id: card.id,
     type: 'Hero',
     code: card.code,
     name: card.name,
@@ -116,7 +112,7 @@ export function toHero(card: CardEntity): { id: number } & Hero {
   };
 }
 
-export function toCard(card: CardEntity): { id: number } & Card {
+export function toCard(card: CardEntity): Card {
   if (card.type === 'Minion') {
     return toMinion(card);
   }
@@ -134,7 +130,6 @@ export function toCard(card: CardEntity): { id: number } & Card {
 
 export function MinionToEntity(card: Minion): CardEntity {
   return {
-    id: card.id ? card.id : <any>undefined,
     createTime: <any>undefined,
     type: 'Minion',
     code: card.code,
@@ -151,7 +146,6 @@ export function MinionToEntity(card: Minion): CardEntity {
 
 export function SpellToEntity(card: Spell): CardEntity {
   return {
-    id: card.id ? card.id : <any>undefined,
     createTime: <any>undefined,
     type: 'Spell',
     code: card.code,
@@ -168,7 +162,6 @@ export function SpellToEntity(card: Spell): CardEntity {
 
 export function WeaponToEntity(card: Weapon): CardEntity {
   return {
-    id: card.id ? card.id : <any>undefined,
     createTime: <any>undefined,
     type: 'Weapon',
     code: card.code,
@@ -185,7 +178,6 @@ export function WeaponToEntity(card: Weapon): CardEntity {
 
 export function HeroToEntity(card: Hero): CardEntity {
   return {
-    id: card.id ? card.id : <any>undefined,
     createTime: <any>undefined,
     type: 'Hero',
     code: card.code,

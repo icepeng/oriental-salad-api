@@ -3,6 +3,7 @@ import { Service } from 'typedi';
 import { EntityManager } from 'typeorm';
 
 import { NotFoundError } from '../error';
+import { CARD_LIST } from './cards';
 import { Card, toCard, toCardEntity } from './dto';
 
 @Service()
@@ -12,8 +13,8 @@ export class CardService {
     return cards.map(card => toCard(card));
   }
 
-  public async getOne(entityManager: EntityManager, id: number): Promise<Card> {
-    const card = await entityManager.getRepository(CardEntity).findOne({ id });
+  public async getOne(entityManager: EntityManager, code: string): Promise<Card> {
+    const card = await entityManager.getRepository(CardEntity).findOne({ code });
     if (!card) {
       throw new NotFoundError();
     }
@@ -23,13 +24,19 @@ export class CardService {
   public async create(
     entityManager: EntityManager,
     card: Card,
-    organizationId: number,
-  ): Promise<number> {
+  ): Promise<string> {
     const cardEntity = toCardEntity(card);
     const createdEntity = await entityManager
       .getRepository(CardEntity)
       .save(cardEntity);
 
-    return createdEntity.id;
+    return createdEntity.code;
+  }
+
+  public async init(entityManager: EntityManager) {
+    const cards = CARD_LIST.map(item => toCardEntity(item));
+    return entityManager
+      .getRepository(CardEntity)
+      .save(cards);
   }
 }

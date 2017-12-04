@@ -26,9 +26,9 @@ export class JudgeEntity {
   @JoinColumn({ name: 'uploadId' })
   upload?: UploadEntity;
 
-  @Column('int') cardId: number;
+  @Column() cardCode: string;
 
   @ManyToOne(type => CardEntity, card => card.judges)
-  @JoinColumn({ name: 'cardId' })
+  @JoinColumn({ name: 'cardCode' })
   card?: CardEntity;
 }

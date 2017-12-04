@@ -4,16 +4,14 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
 } from 'typeorm';
 
 @Entity('card')
 export class CardEntity {
-  @PrimaryGeneratedColumn() id: number;
+  @PrimaryColumn() code: string;
 
   @CreateDateColumn() createTime: Date;
-
-  code: string;
 
   @Column() name: string;
 
