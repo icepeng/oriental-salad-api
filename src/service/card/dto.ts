@@ -49,7 +49,7 @@ export interface Minion extends CardBase {
 export type Card = Minion | Spell | Weapon | Hero;
 
 export function toMinion(card: CardEntity): Minion {
-  if (!card.health || !card.attack) {
+  if (card.health === null || card.attack === null) {
     throw new Error('Not Minion');
   }
   return {
@@ -66,7 +66,7 @@ export function toMinion(card: CardEntity): Minion {
 }
 
 export function toSpell(card: CardEntity): Spell {
-  if (!card.health || !card.attack || card.class === 'Neutral') {
+  if (card.class === 'Neutral') {
     throw new Error('Not Spell');
   }
   return {
@@ -81,7 +81,11 @@ export function toSpell(card: CardEntity): Spell {
 }
 
 export function toWeapon(card: CardEntity): Weapon {
-  if (!card.durability || !card.attack || card.class === 'Neutral') {
+  if (
+    card.durability === null ||
+    card.attack === null ||
+    card.class === 'Neutral'
+  ) {
     throw new Error('Not Weapon');
   }
   return {
