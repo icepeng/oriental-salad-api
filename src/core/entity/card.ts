@@ -38,11 +38,14 @@ export class CardEntity {
 
   @Column() cost: number;
 
-  @Column() attack: number | null;
+  @Column('int', { nullable: true })
+  attack: number | null;
 
-  @Column() health: number | null;
+  @Column('int', { nullable: true })
+  health: number | null;
 
-  @Column() durability: number | null;
+  @Column('int', { nullable: true })
+  durability: number | null;
 
   @OneToMany(type => JudgeEntity, judge => judge.card)
   judges?: JudgeEntity[];
