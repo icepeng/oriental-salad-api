@@ -4,7 +4,6 @@ export const ROUTE_LIST = {
     'POST /upload': 'UploadController.add',
     'POST /upload/search': 'UploadController.findByName',
     'GET /upload/meaningless': 'UploadController.findMeaningless',
-    'DELETE /upload/meaningless': 'UploadController.removeMeaningless',
     'GET /upload/:id': 'UploadController.getOne',
 
     'GET /cards': 'CardController.getAll',

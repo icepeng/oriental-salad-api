@@ -65,15 +65,6 @@ export class UploadController {
     });
   };
 
-  removeMeaningless = async (
-    {  }: Request,
-    res: Response,
-    tx: EntityManager,
-  ) => {
-    await this.uploadService.removeMeaningless(tx, 5);
-    return res.ok();
-  };
-
   add = async ({ body }: Request, res: Response, tx: EntityManager) => {
     const { error, value } = uploadValidator(body);
     if (error) {
