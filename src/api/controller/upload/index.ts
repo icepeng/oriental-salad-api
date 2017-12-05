@@ -4,7 +4,7 @@ import { EntityManager } from 'typeorm';
 import { UploadService } from '../../../service';
 import { NotFoundError } from '../../../service/error';
 import { Request, Response } from '../../yoshi';
-import { idValidator, uploadValidator } from './validator';
+import { idValidator, nameValidator, uploadValidator } from './validator';
 
 @Service()
 export class UploadController {
@@ -32,6 +32,46 @@ export class UploadController {
       }
       throw err;
     }
+  };
+
+  findByName = async ({ body }: Request, res: Response, tx: EntityManager) => {
+    const { error, value } = nameValidator(body);
+    if (error) {
+      return res.badRequest({
+        message: error.message,
+      });
+    }
+
+    try {
+      const item = await this.uploadService.findByName(tx, value.name);
+
+      return res.ok({
+        uploads: item,
+      });
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        return res.notFound({
+          message: 'No upload found with the given id.',
+        });
+      }
+      throw err;
+    }
+  };
+
+  findMeaningless = async ({  }: Request, res: Response, tx: EntityManager) => {
+    const item = await this.uploadService.findMeaningless(tx, 5);
+    return res.ok({
+      upload: item,
+    });
+  };
+
+  removeMeaningless = async (
+    {  }: Request,
+    res: Response,
+    tx: EntityManager,
+  ) => {
+    await this.uploadService.removeMeaningless(tx, 5);
+    return res.ok();
   };
 
   add = async ({ body }: Request, res: Response, tx: EntityManager) => {
