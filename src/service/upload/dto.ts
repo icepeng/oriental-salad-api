@@ -12,6 +12,12 @@ export interface Judge {
   cardCode: string;
 }
 
+export interface Stat {
+  id: string;
+  name: string;
+  average: number;
+}
+
 export function toJudge(judge: JudgeEntity): Judge {
   return {
     value: judge.value,
@@ -47,5 +53,12 @@ export function toUploadEntity(upload: Upload): UploadEntity {
     id: <any>undefined,
     createTime: <any>undefined,
     name: upload.name,
+  };
+}
+
+export function formatStat(stat: Stat) {
+  return {
+    ...stat,
+    average: Math.round(stat.average * 10) / 10,
   };
 }

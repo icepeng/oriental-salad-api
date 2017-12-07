@@ -3,7 +3,14 @@ import { EntityManager } from 'typeorm';
 
 import { JudgeEntity, UploadEntity } from '../../core';
 import { NotFoundError } from '../error';
-import { toJudgeEntity, toUpload, toUploadEntity, Upload } from './dto';
+import {
+  formatStat,
+  Stat,
+  toJudgeEntity,
+  toUpload,
+  toUploadEntity,
+  Upload,
+} from './dto';
 
 @Service()
 export class UploadService {
@@ -37,26 +44,6 @@ export class UploadService {
     }));
   }
 
-  public async findMeaningless(entityManager: EntityManager, count: number) {
-    const allUploads = <({
-      judges: JudgeEntity[];
-    } & UploadEntity)[]>await entityManager
-      .getRepository(UploadEntity)
-      .createQueryBuilder('upload')
-      .leftJoinAndSelect('upload.judges', 'judges')
-      .getMany();
-
-    return allUploads.filter(upload => upload.judges.length <= count);
-  }
-
-  public async removeMeaningless(entityManager: EntityManager, count: number) {
-    const meaningless = await this.findMeaningless(entityManager, count);
-    const meaninglessJudges = meaningless.reduce((arr, x) => [...arr, ...x.judges], []);
-    await entityManager.getRepository(JudgeEntity).remove(meaninglessJudges);
-    await entityManager.getRepository(UploadEntity).remove(meaningless);
-    return;
-  }
-
   public async create(
     entityManager: EntityManager,
     upload: Upload,
@@ -72,5 +59,48 @@ export class UploadService {
     await entityManager.getRepository(JudgeEntity).save(judgeEntities);
 
     return createdUpload.id;
+  }
+
+  public async getStats(entityManager: EntityManager) {
+    const judgeCount = await entityManager.getRepository(JudgeEntity).count();
+    const uploadCount = await entityManager.getRepository(UploadEntity).count();
+    const highestValues = <Stat[]>await entityManager.query(
+      `SELECT x.id, x.name, x.average
+    FROM (SELECT upload.id, upload.name, avg(judge.value) AS average, count(judge.id) AS Count
+          FROM upload LEFT OUTER JOIN judge ON judge."uploadId" = upload.id GROUP BY upload.id) AS x
+    WHERE Count > 100 order by average DESC LIMIT 3;`,
+    );
+    const lowestValues = <Stat[]>await entityManager.query(
+      `SELECT x.id, x.name, x.average
+    FROM (SELECT upload.id, upload.name, avg(judge.value) AS average, count(judge.id) AS Count
+          FROM upload LEFT OUTER JOIN judge ON judge."uploadId" = upload.id GROUP BY upload.id) AS x
+    WHERE Count > 100 order by average ASC LIMIT 3;`,
+    );
+    const highestPotentials = <Stat[]>await entityManager.query(
+      `SELECT x.id, x.name, x.average
+    FROM (SELECT upload.id, upload.name, avg(judge.potential) AS average, count(judge.id) AS Count
+          FROM upload LEFT OUTER JOIN judge ON judge."uploadId" = upload.id GROUP BY upload.id) AS x
+    WHERE Count > 100 order by average DESC LIMIT 3;`,
+    );
+    const lowestPotentials = <Stat[]>await entityManager.query(
+      `SELECT x.id, x.name, x.average
+    FROM (SELECT upload.id, upload.name, avg(judge.potential) AS average, count(judge.id) AS Count
+          FROM upload LEFT OUTER JOIN judge ON judge."uploadId" = upload.id GROUP BY upload.id) AS x
+    WHERE Count > 100 order by average ASC LIMIT 3;`,
+    );
+    const longestDescriptions = await entityManager.query(`
+      SELECT upload.id, upload.name, sum(char_length(judge.description)) AS length
+       FROM upload
+       LEFT OUTER JOIN judge ON judge."uploadId" = upload.id
+       GROUP BY upload.id ORDER BY length DESC LIMIT 3;`);
+    return {
+      judgeCount,
+      uploadCount,
+      longestDescriptions,
+      highestValues: highestValues.map(x => formatStat(x)),
+      lowestValues: lowestValues.map(x => formatStat(x)),
+      highestPotentials: highestPotentials.map(x => formatStat(x)),
+      lowestPotentials: lowestPotentials.map(x => formatStat(x)),
+    };
   }
 }

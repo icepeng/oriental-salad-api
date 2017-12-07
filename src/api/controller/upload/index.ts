@@ -58,13 +58,6 @@ export class UploadController {
     }
   };
 
-  findMeaningless = async ({  }: Request, res: Response, tx: EntityManager) => {
-    const item = await this.uploadService.findMeaningless(tx, 5);
-    return res.ok({
-      upload: item,
-    });
-  };
-
   add = async ({ body }: Request, res: Response, tx: EntityManager) => {
     const { error, value } = uploadValidator(body);
     if (error) {
@@ -75,5 +68,10 @@ export class UploadController {
 
     const id = await this.uploadService.create(tx, value);
     return res.ok({ id });
+  };
+
+  getStats = async ({  }: Request, res: Response, tx: EntityManager) => {
+    const stats = await this.uploadService.getStats(tx);
+    return res.ok({ stats });
   };
 }
