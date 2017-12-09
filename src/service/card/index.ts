@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { EntityManager } from 'typeorm';
-import { calculateStats } from 'util/stat';
+import { calculateStats } from '../../util/stat';
 
 import { CardEntity, CardStatEntity, JudgeEntity } from '../../core';
 import { NotFoundError } from '../error';
