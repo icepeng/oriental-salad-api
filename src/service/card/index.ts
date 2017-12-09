@@ -54,9 +54,11 @@ export class CardService {
     const judgeTotal = card.judges.length;
     const descriptionAverage =
       judgeTotal > 0
-        ? card.judges.reduce((sum, x) => sum + x.description.length, 0) /
-          judgeTotal
-        : 0;
+        ? (
+            card.judges.reduce((sum, x) => sum + x.description.length, 0) /
+            judgeTotal
+          ).toString()
+        : '0';
     return {
       value,
       potential,
