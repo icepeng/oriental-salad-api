@@ -48,6 +48,18 @@ export interface Minion extends CardBase {
 
 export type Card = Minion | Spell | Weapon | Hero;
 
+export interface CardStat {
+  20: number;
+  30: number;
+  40: number;
+  50: number;
+  60: number;
+  70: number;
+  80: number;
+  mean: number;
+  stdev: number;
+}
+
 export function toMinion(card: CardEntity): Minion {
   if (card.health === null || card.attack === null) {
     throw new Error('Not Minion');

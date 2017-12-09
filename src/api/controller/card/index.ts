@@ -23,4 +23,14 @@ export class CardController {
     await this.cardService.init(tx);
     return res.ok();
   };
+
+  getStatTotal = async ({  }: Request, res: Response, tx: EntityManager) => {
+    const stats = await this.cardService.getStatTotal(tx);
+    return res.ok({ stats });
+  };
+
+  getStatDetail = async ({ params }: Request, res: Response, tx: EntityManager) => {
+    const stats = await this.cardService.getStatDetail(tx, params.id);
+    return res.ok({ stats });
+  };
 }

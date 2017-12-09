@@ -3,9 +3,11 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryColumn,
 } from 'typeorm';
 
+import { CardStatEntity } from './cardStat';
 import { JudgeEntity } from './judge';
 
 @Entity('card')
@@ -35,7 +37,7 @@ export class CardEntity {
     | 'Warrior'
     | 'Neutral';
 
-  @Column() cost: number;
+  @Column('int') cost: number;
 
   @Column('int', { nullable: true })
   attack: number | null;
@@ -48,4 +50,7 @@ export class CardEntity {
 
   @OneToMany(type => JudgeEntity, judge => judge.card)
   judges?: JudgeEntity[];
+
+  @OneToOne(type => CardStatEntity, stat => stat.card)
+  stat?: CardStatEntity;
 }
