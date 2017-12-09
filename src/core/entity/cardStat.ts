@@ -40,7 +40,7 @@ export class CardStatEntity {
 
   @Column() judgeTotal: number;
 
-  @Column('numeric') descriptionAverage: number;
+  @Column('numeric') descriptionAverage: string;
 
   @Column() cardCode: string;
 
