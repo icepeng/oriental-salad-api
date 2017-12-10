@@ -5,7 +5,7 @@ import { calculateStats } from '../../util/stat';
 import { CardEntity, CardStatEntity, JudgeEntity } from '../../core';
 import { NotFoundError } from '../error';
 import { CARD_LIST } from './cards';
-import { Card, CardStat, toCard, toCardEntity } from './dto';
+import { Card, toCard, toCardEntity } from './dto';
 
 @Service()
 export class CardService {
@@ -90,102 +90,47 @@ export class CardService {
     return stats;
   }
 
-  private async fetchStatDetail(
-    entityManager: EntityManager,
-    cardCode: string,
-  ) {
-    const cachedStats = await entityManager
-      .getRepository(CardStatEntity)
-      .findOne({ cardCode });
-
-    if (cachedStats) {
-      return cachedStats;
-    }
-
-    const card = <{
-      judges: JudgeEntity[];
-    } & CardEntity>await entityManager.getRepository(CardEntity).findOne({
-      where: { code: cardCode },
-      relations: ['judges'],
-    });
-
-    if (!card) {
-      throw new NotFoundError();
-    }
-
-    const stats = this.buildCardStat(card);
-
-    await entityManager.getRepository(CardStatEntity).save(stats);
-
-    return stats;
-  }
-
-  private getMax(arr: CardStat) {
-    let max = 80;
-    while (arr[max] === 0) {
-      max -= 10;
-      if (max < 20) {
-        return 0;
-      }
-    }
-    return max;
-  }
-
-  private getMin(arr: CardStat) {
-    let max = 20;
-    while (arr[max] === 0) {
-      max -= 10;
-      if (max > 80) {
-        return 0;
-      }
-    }
-    return max;
-  }
-
   public async getStatDetail(entityManager: EntityManager, cardCode: string) {
-    const stats = await this.fetchStatDetail(entityManager, cardCode);
-
-    const maxValue = this.getMax(stats.value);
-    const minValue = this.getMin(stats.value);
-    const maxPotential = this.getMax(stats.potential);
-    const minPotential = this.getMin(stats.potential);
-
     const judgeRepo = entityManager.getRepository(JudgeEntity);
 
     const maxValueJudge = await judgeRepo
       .createQueryBuilder('judge')
       .leftJoinAndSelect('judge.upload', 'upload')
       .where('judge.cardCode = :cardCode', { cardCode })
-      .andWhere('judge.value = :maxValue', { maxValue })
       .andWhere('char_length(judge.description) > 0')
-      .orderBy('random()')
+      .orderBy('judge.value', 'DESC')
+      .addOrderBy('random()')
+      .limit(1)
       .getOne();
 
     const minValueJudge = await judgeRepo
       .createQueryBuilder('judge')
       .leftJoinAndSelect('judge.upload', 'upload')
       .where('judge.cardCode = :cardCode', { cardCode })
-      .andWhere('judge.value = :minValue', { minValue })
       .andWhere('char_length(judge.description) > 0')
-      .orderBy('random()')
+      .orderBy('judge.value', 'ASC')
+      .addOrderBy('random()')
+      .limit(1)
       .getOne();
 
     const maxPotentialJudge = await judgeRepo
       .createQueryBuilder('judge')
       .leftJoinAndSelect('judge.upload', 'upload')
       .where('judge.cardCode = :cardCode', { cardCode })
-      .andWhere('judge.potential = :maxPotential', { maxPotential })
       .andWhere('char_length(judge.description) > 0')
-      .orderBy('random()')
+      .orderBy('judge.potential', 'DESC')
+      .addOrderBy('random()')
+      .limit(1)
       .getOne();
 
     const minPotentialJudge = await judgeRepo
       .createQueryBuilder('judge')
       .leftJoinAndSelect('judge.upload', 'upload')
       .where('judge.cardCode = :cardCode', { cardCode })
-      .andWhere('judge.potential = :minPotential', { minPotential })
       .andWhere('char_length(judge.description) > 0')
-      .orderBy('random()')
+      .orderBy('judge.potential', 'ASC')
+      .addOrderBy('random()')
+      .limit(1)
       .getOne();
 
     const longestJudge = await judgeRepo
@@ -193,6 +138,7 @@ export class CardService {
       .leftJoinAndSelect('judge.upload', 'upload')
       .where('judge.cardCode = :cardCode', { cardCode })
       .orderBy('char_length(judge.description)', 'DESC')
+      .limit(1)
       .getOne();
 
     return {
