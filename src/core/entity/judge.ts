@@ -16,9 +16,9 @@ export class JudgeEntity {
 
   @CreateDateColumn() createTime: Date;
 
-  @Column() value: number;
+  @Column('int') value: number;
 
-  @Column() potential: number;
+  @Column('int') potential: number;
 
   @Column('text') description: string;
 

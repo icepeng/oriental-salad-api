@@ -38,13 +38,13 @@ export class CardStatEntity {
     stdev: number;
   };
 
-  @Column() judgeTotal: number;
+  @Column('int') judgeTotal: number;
 
   @Column('numeric') descriptionAverage: string;
 
-  @Column() cardCode: string;
+  @Column('text') cardCode: string;
 
-  @OneToOne(type => CardEntity, card => card.judges)
+  @OneToOne(type => CardEntity, card => card.stat)
   @JoinColumn({ name: 'cardCode' })
   card?: CardEntity;
 }

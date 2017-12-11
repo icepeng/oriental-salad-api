@@ -8,23 +8,24 @@ import {
 } from 'typeorm';
 
 import { CardStatEntity } from './cardStat';
+import { HSReplayStatEntity } from './hsreplayStat';
 import { JudgeEntity } from './judge';
 
 @Entity('card')
 export class CardEntity {
-  @PrimaryColumn() code: string;
+  @PrimaryColumn('text') code: string;
 
   @CreateDateColumn() createTime: Date;
 
-  @Column() name: string;
+  @Column('text') name: string;
 
-  @Column() imgLink: string;
+  @Column('text') imgLink: string;
 
-  @Column() type: 'Minion' | 'Spell' | 'Weapon' | 'Hero';
+  @Column('text') type: 'Minion' | 'Spell' | 'Weapon' | 'Hero';
 
-  @Column() rarity: 'Free' | 'Common' | 'Rare' | 'Epic' | 'Legendary';
+  @Column('text') rarity: 'Free' | 'Common' | 'Rare' | 'Epic' | 'Legendary';
 
-  @Column()
+  @Column('text')
   class:
     | 'Mage'
     | 'Warlock'
@@ -53,4 +54,7 @@ export class CardEntity {
 
   @OneToOne(type => CardStatEntity, stat => stat.card)
   stat?: CardStatEntity;
+
+  @OneToOne(type => HSReplayStatEntity, hsreplayStat => hsreplayStat.card)
+  hsreplayStat?: HSReplayStatEntity;
 }
