@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { HSReplayStatEntity } from 'core';
 import { createConnection } from 'typeorm';
 
 import * as Config from '../config';
+import { HSReplayStatEntity } from '../core';
 import { CARD_LIST } from '../service/card/cards';
 
 const hsreplay: { name: string; dbfId: number }[] = require('./hsreplay');
