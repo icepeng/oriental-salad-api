@@ -3,15 +3,13 @@ import {
   Entity,
   JoinColumn,
   OneToOne,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
 } from 'typeorm';
 
 import { CardEntity } from './card';
 
 @Entity('hsreplay_stat')
 export class HSReplayStatEntity {
-  @PrimaryGeneratedColumn() id: number;
-
   @Column('timestamp') updateTime: string;
 
   @Column('numeric') popularity: string;
@@ -22,7 +20,7 @@ export class HSReplayStatEntity {
 
   @Column('int') decks: number;
 
-  @Column() cardCode: string;
+  @PrimaryColumn('text') cardCode: string;
 
   @OneToOne(type => CardEntity, card => card.hsreplayStat)
   @JoinColumn({ name: 'cardCode' })

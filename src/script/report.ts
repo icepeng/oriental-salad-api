@@ -55,10 +55,10 @@ async function run() {
     await connection.close();
 
     console.log('inserted');
-    setTimeout(run, 1000 * 60);
+    setTimeout(run, 1000 * 60 * 10);
   } catch (err) {
     console.error(err);
-    setTimeout(run, 1000 * 60);
+    setTimeout(run, 1000 * 60 * 10);
   }
 }
 

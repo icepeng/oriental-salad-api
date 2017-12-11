@@ -68,15 +68,7 @@ export class CardService {
     };
   }
 
-  public async getStatTotal(entityManager: EntityManager) {
-    const cachedStats = await entityManager
-      .getRepository(CardStatEntity)
-      .find();
-
-    if (cachedStats.length > 0) {
-      return cachedStats;
-    }
-
+  private async saveStats(entityManager: EntityManager) {
     const cards = <({
       judges: JudgeEntity[];
     } & CardEntity)[]>await entityManager
@@ -88,6 +80,33 @@ export class CardService {
     await entityManager.getRepository(CardStatEntity).save(stats);
 
     return stats;
+  }
+
+  public async getStatTotal(entityManager: EntityManager) {
+    const cardsWithStat = await entityManager
+      .getRepository(CardEntity)
+      .find({ relations: ['hsreplayStat', 'stat'] });
+
+    try {
+      return cardsWithStat.map(card => {
+        if (!card.stat) {
+          throw new NotFoundError();
+        }
+        if (!card.hsreplayStat) {
+          return card.stat;
+        }
+        return {
+          ...card.stat,
+          hsreplay: {
+            winRate: card.hsreplayStat.winRate,
+            popularity: card.hsreplayStat.popularity,
+          },
+        };
+      });
+    } catch (err) {
+      await this.saveStats(entityManager);
+      throw err;
+    }
   }
 
   public async getStatDetail(entityManager: EntityManager, cardCode: string) {
