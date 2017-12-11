@@ -4,8 +4,7 @@ import { createConnection } from 'typeorm';
 import * as Config from '../config';
 import { HSReplayStatEntity } from '../core';
 import { CARD_LIST } from '../service/card/cards';
-
-const hsreplay: { name: string; dbfId: number }[] = require('./hsreplay');
+import { hsreplayMap } from './hsreplay';
 
 async function run() {
   try {
@@ -16,7 +15,7 @@ async function run() {
       )
       .then(res => res.data);
     const data = hsreplayResponse.series.data;
-    const namedData = hsreplay
+    const namedData = hsreplayMap
       .reduce((arr, x) => {
         const matchedCard = data.ALL.find(card => card.dbf_id === x.dbfId);
         if (!matchedCard) {

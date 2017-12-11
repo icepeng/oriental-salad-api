@@ -17,7 +17,6 @@
     "noUnusedLocals": true,
     "baseUrl": "src"
   },
-  "filesGlob": ["src/**/*.ts"],
   "include": ["src/**/*.ts"],
   "exclude": ["src/**/*.spec.ts"]
 }
