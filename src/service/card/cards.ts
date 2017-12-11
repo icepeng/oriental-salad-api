@@ -212,7 +212,7 @@ export const CARD_LIST: Card[] = [
   },
   {
     code: 'Candleshot',
-    name: '양초화살',
+    name: '양초 화살',
     type: 'Weapon',
     class: 'Hunter',
     cost: 1,
@@ -426,7 +426,7 @@ export const CARD_LIST: Card[] = [
   },
   {
     code: 'Unidentified_Shield',
-    name: '정체 불명의 방패',
+    name: '정체불명의 방패',
     type: 'Spell',
     class: 'Warrior',
     cost: 6,
@@ -1126,7 +1126,7 @@ export const CARD_LIST: Card[] = [
   },
   {
     code: 'Spiteful_Summoner',
-    name: '원한 맻힌 소환사',
+    name: '원한 맺힌 소환사',
     type: 'Minion',
     class: 'Neutral',
     cost: 6,
