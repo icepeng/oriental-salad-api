@@ -2,8 +2,7 @@ import axios from 'axios';
 import { createConnection } from 'typeorm';
 
 import * as Config from '../config';
-import { CardEntity, HSReplayStatEntity } from '../core';
-import { CARD_LIST } from '../service/card/cards';
+import { HSReplayStatEntity } from '../core';
 import { hsreplayMap } from './hsreplay';
 
 async function run() {
