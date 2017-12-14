@@ -2,7 +2,7 @@ import axios from 'axios';
 import { createConnection } from 'typeorm';
 
 import * as Config from '../config';
-import { HSReplayStatEntity } from '../core';
+import { CardEntity, HSReplayStatEntity } from '../core';
 import { CARD_LIST } from '../service/card/cards';
 import { hsreplayMap } from './hsreplay';
 
@@ -15,39 +15,48 @@ async function run() {
       )
       .then(res => res.data);
     const data = hsreplayResponse.series.data;
-    const namedData = hsreplayMap
-      .reduce((arr, x) => {
-        const matchedCard = data.ALL.find(card => card.dbf_id === x.dbfId);
-        if (!matchedCard) {
-          return arr;
-        }
-        return [...arr, { x, matchedCard }];
-      }, [])
-      .map(({ x, matchedCard }) => {
-        return {
-          dbfId: x.dbfId,
-          name: x.name,
-          popularity: matchedCard.popularity,
-          winRate: matchedCard.winrate,
-          count: matchedCard.count,
-          decks: matchedCard.decks,
-        };
-      });
-    const hsreplayStats: HSReplayStatEntity[] = namedData.map(x => {
-      const matchedCard = CARD_LIST.find(card => card.name === x.name);
-      if (!matchedCard) {
+    const hsreplayStats: HSReplayStatEntity[] = hsreplayMap.reduce((arr, x) => {
+      const matchedCardFromAll = data.ALL.find(card => card.dbf_id === x.dbfId);
+      if (!matchedCardFromAll) {
         throw new Error(x.name);
       }
-      return {
-        id: <any>undefined,
-        updateTime: hsreplayResponse.as_of,
-        decks: x.decks,
-        count: x.count.toString(),
-        popularity: x.popularity.toString(),
-        winRate: x.winRate.toString(),
-        cardCode: matchedCard.code,
-      };
-    });
+      if (x.cardClass === 'NEUTRAL') {
+        return [
+          ...arr,
+          {
+            updateTime: hsreplayResponse.as_of,
+            dbfId: x.dbfId,
+            name: x.name,
+            popularityAll: matchedCardFromAll.popularity.toString(),
+            popularityClass: null,
+            winRate: matchedCardFromAll.winrate.toString(),
+            count: matchedCardFromAll.count.toString(),
+            decks: matchedCardFromAll.decks,
+            cardCode: x.cardCode,
+          },
+        ];
+      }
+      const matchedCardFromClass = data[x.cardClass].find(
+        card => card.dbf_id === x.dbfId,
+      );
+      if (!matchedCardFromClass) {
+        throw new Error(x.name);
+      }
+      return [
+        ...arr,
+        {
+          updateTime: hsreplayResponse.as_of,
+          dbfId: x.dbfId,
+          name: x.name,
+          popularityAll: matchedCardFromAll.popularity.toString(),
+          popularityClass: matchedCardFromClass.popularity.toString(),
+          winRate: matchedCardFromAll.winrate.toString(),
+          count: matchedCardFromAll.count.toString(),
+          decks: matchedCardFromAll.decks,
+          cardCode: x.cardCode,
+        },
+      ];
+    }, []);
 
     const connection = await createConnection(Config.pgConfig);
     await connection.getRepository(HSReplayStatEntity).save(hsreplayStats);
@@ -62,6 +71,39 @@ async function run() {
 }
 
 run();
+
+// async function yoshi() {
+//   const connection = await createConnection(Config.pgConfig);
+//   const res = await connection
+//     .getRepository(CardEntity)
+//     .find({ relations: ['hsreplayStat', 'stat'] });
+//   await connection.close();
+//   const stats = res.map(x => {
+//     if (!x.hsreplayStat || !x.stat) {
+//       throw new Error('Fuck');
+//     }
+//     return {
+//       ...x.hsreplayStat,
+//       ...x.stat,
+//     };
+//   });
+//   stats.forEach(x => console.log(x.cardCode, x.value.mean, x.value.stdev, x.potential.mean, x.potential.stdev, x.winRate, x.popularity));
+//   const meanValue = stats.reduce((sum, stat) => sum + stat.value.mean, 0) / stats.length;
+//   console.log(meanValue);
+//   const meanPotential = stats.reduce((sum, stat) => sum + stat.potential.mean, 0) / stats.length;
+//   console.log(meanPotential);
+//   const normalized = stats.map(x => {
+//     return {
+//       value: (x.value.mean - 50) / 60,
+//       potential: (x.potential.mean - 50),
+//       winrate: x.winRate,
+//       popularity: x.popularity,
+//     };
+//   });
+//   console.log(normalized);
+// }
+
+// yoshi();
 
 interface HSReplayData {
   dbf_id: number;

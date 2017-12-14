@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 
 import { CardEntity } from './card';
 
@@ -12,7 +6,10 @@ import { CardEntity } from './card';
 export class HSReplayStatEntity {
   @Column('timestamp') updateTime: string;
 
-  @Column('numeric') popularity: string;
+  @Column('numeric') popularityAll: string;
+
+  @Column('numeric', { nullable: true })
+  popularityClass: string | null;
 
   @Column('numeric') winRate: string;
 
