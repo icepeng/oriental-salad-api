@@ -1,9 +1,23 @@
-export const hsreplayMap: {
+export type CardClass =
+  | 'MAGE'
+  | 'DRUID'
+  | 'HUNTER'
+  | 'PRIEST'
+  | 'WARLOCK'
+  | 'SHAMAN'
+  | 'WARRIOR'
+  | 'ROGUE'
+  | 'PALADIN'
+  | 'NEUTRAL';
+
+export interface HSReplayMap {
   dbfId: number;
-  cardClass: 'MAGE' | 'DRUID' | 'HUNTER' | 'PRIEST' | 'WARLOCK' | 'SHAMAN' | 'WARRIOR' | 'ROGUE' | 'PALADIN' | 'NEUTRAL';
+  cardClass: CardClass;
   name: string;
   cardCode: string;
-}[] = [
+}
+
+export const hsreplayMap: ReadonlyArray<HSReplayMap> = [
   {
     dbfId: 46499,
     cardClass: 'MAGE',

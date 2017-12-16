@@ -99,7 +99,15 @@ export class CardService {
           ...card.stat,
           hsreplay: {
             winRate: card.hsreplayStat.winRate,
-            popularity: card.hsreplayStat.popularity,
+            popularity: card.hsreplayStat.popularityAll,
+            popularityClass: card.hsreplayStat.popularityClass,
+            value: card.hsreplayStat.value,
+            potential: card.hsreplayStat.potential,
+            archetypes:
+              typeof card.hsreplayStat.archetypes === 'string'
+                ? JSON.parse(<any>card.hsreplayStat.archetypes)
+                : card.hsreplayStat.archetypes,
+            // TODO: remove JSON.parse when typeorm bug fixed
           },
         };
       });

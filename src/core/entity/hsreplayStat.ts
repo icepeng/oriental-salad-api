@@ -17,6 +17,22 @@ export class HSReplayStatEntity {
 
   @Column('int') decks: number;
 
+  @Column('numeric') value: string;
+
+  @Column('numeric') potential: string;
+
+  @Column('json') archetypes: {
+    id: number;
+    name: string;
+    playerClass: string;
+    url: string;
+    winRate: number;
+    popularity: number;
+    popularityClass: number;
+    totalGames: number;
+    weight: number;
+  }[];
+
   @PrimaryColumn('text') cardCode: string;
 
   @OneToOne(type => CardEntity, card => card.hsreplayStat)

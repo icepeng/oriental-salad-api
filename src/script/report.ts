@@ -5,15 +5,29 @@ import * as Config from '../config';
 import { HSReplayStatEntity } from '../core';
 import { hsreplayMap } from './hsreplay';
 
+const UPDATE_INTERVAL = 1000 * 60 * 5;
+
+export type PlayerClass =
+  | 'MAGE'
+  | 'DRUID'
+  | 'HUNTER'
+  | 'PRIEST'
+  | 'WARLOCK'
+  | 'SHAMAN'
+  | 'WARRIOR'
+  | 'ROGUE'
+  | 'PALADIN';
+
 async function run() {
   try {
-    const hsreplayResponse: HSReplayResponse = await axios
+    const hsreplayResponse: HSReplayResponse<CardPopularity> = await axios
       .get(
         // tslint:disable-next-line:max-line-length
         'http://hsreplay.net/analytics/query/card_included_popularity_report/?GameType=RANKED_STANDARD&RankRange=ALL&TimeRange=CURRENT_EXPANSION',
       )
       .then(res => res.data);
     const data = hsreplayResponse.series.data;
+    const transformedData = await getTransformedData();
     const hsreplayStats: HSReplayStatEntity[] = hsreplayMap.reduce((arr, x) => {
       const matchedCardFromAll = data.ALL.find(card => card.dbf_id === x.dbfId);
       if (!matchedCardFromAll) {
@@ -32,6 +46,9 @@ async function run() {
             count: matchedCardFromAll.count.toString(),
             decks: matchedCardFromAll.decks,
             cardCode: x.cardCode,
+            value: transformedData[x.cardCode].value,
+            potential: transformedData[x.cardCode].potential,
+            archetypes: transformedData[x.cardCode].archetypes,
           },
         ];
       }
@@ -53,6 +70,9 @@ async function run() {
           count: matchedCardFromAll.count.toString(),
           decks: matchedCardFromAll.decks,
           cardCode: x.cardCode,
+          value: transformedData[x.cardCode].value,
+          potential: transformedData[x.cardCode].potential,
+          archetypes: transformedData[x.cardCode].archetypes,
         },
       ];
     }, []);
@@ -62,49 +82,148 @@ async function run() {
     await connection.close();
 
     console.log('inserted');
-    setTimeout(run, 1000 * 60 * 10);
+    setTimeout(run, UPDATE_INTERVAL);
   } catch (err) {
     console.error(err);
-    setTimeout(run, 1000 * 60 * 10);
+    setTimeout(run, UPDATE_INTERVAL);
   }
 }
 
 run();
 
-// async function yoshi() {
-//   const connection = await createConnection(Config.pgConfig);
-//   const res = await connection
-//     .getRepository(CardEntity)
-//     .find({ relations: ['hsreplayStat', 'stat'] });
-//   await connection.close();
-//   const stats = res.map(x => {
-//     if (!x.hsreplayStat || !x.stat) {
-//       throw new Error('Fuck');
-//     }
-//     return {
-//       ...x.hsreplayStat,
-//       ...x.stat,
-//     };
-//   });
-//   stats.forEach(x => console.log(x.cardCode, x.value.mean, x.value.stdev, x.potential.mean, x.potential.stdev, x.winRate, x.popularity));
-//   const meanValue = stats.reduce((sum, stat) => sum + stat.value.mean, 0) / stats.length;
-//   console.log(meanValue);
-//   const meanPotential = stats.reduce((sum, stat) => sum + stat.potential.mean, 0) / stats.length;
-//   console.log(meanPotential);
-//   const normalized = stats.map(x => {
-//     return {
-//       value: (x.value.mean - 50) / 60,
-//       potential: (x.potential.mean - 50),
-//       winrate: x.winRate,
-//       popularity: x.popularity,
-//     };
-//   });
-//   console.log(normalized);
-// }
+async function getTransformedData() {
+  const archetypePopularity: HSReplayResponse<ArchetypePopularity> = await axios
+    .get(
+      // tslint:disable-next-line:max-line-length
+      'https://hsreplay.net/analytics/query/archetype_popularity_distribution_stats/?GameType=RANKED_STANDARD&RankRange=LEGEND_THROUGH_TWENTY&Region=ALL&TimeRange=LAST_7_DAYS',
+    )
+    .then(res => res.data);
 
-// yoshi();
+  const archetypes = [
+    'MAGE',
+    'DRUID',
+    'HUNTER',
+    'PRIEST',
+    'WARLOCK',
+    'SHAMAN',
+    'WARRIOR',
+    'ROGUE',
+    'PALADIN',
+  ].reduce((arr, playerClass: PlayerClass) => {
+    const items = archetypePopularity.series.data[playerClass].filter(
+      x => x.archetype_id > 0,
+    );
+    return [...arr, ...items];
+  }, []);
 
-interface HSReplayData {
+  const archetypeDetails = await Promise.all(
+    archetypes.map(archetype =>
+      axios
+        .get(
+          `https://hsreplay.net/api/v1/archetypes/${archetype.archetype_id}/`,
+        )
+        .then((res: { data: ArchetypeDetail }) => ({
+          ...res.data,
+          pct_of_class: archetype.pct_of_class,
+          pct_of_total: archetype.pct_of_total,
+          total_games: archetype.total_games,
+          win_rate: archetype.win_rate,
+        })),
+    ),
+  );
+
+  const cardWeight = hsreplayMap.map(item => ({
+    archetypes: archetypeDetails.reduce((arr, detail) => {
+      const matched = detail.standard_signature.components.find(
+        component => component[0] === item.dbfId && component[1] > 0.1,
+      );
+      if (!matched) {
+        return arr;
+      }
+      return [
+        ...arr,
+        {
+          id: detail.id,
+          name: detail.name,
+          playerClass: detail.player_class_name,
+          url: detail.url,
+          winRate: detail.win_rate,
+          popularity: detail.pct_of_total,
+          popularityClass: detail.pct_of_class,
+          totalGames: detail.total_games,
+          weight: matched[1],
+        },
+      ];
+    }, []),
+    dbfId: item.dbfId,
+    name: item.name,
+    cardCode: item.cardCode,
+  }));
+
+  const rawResult = cardWeight.map(card => {
+    const value = card.archetypes.reduce((sum, x) => sum + x.totalGames, 0);
+    const potential = card.archetypes.reduce(
+      (sum, x) => sum + x.weight * x.totalGames,
+      0,
+    );
+    return {
+      value: Math.log(value || 1),
+      potential: Math.log(potential || 1),
+      name: card.name,
+      dbfId: card.dbfId,
+      cardCode: card.cardCode,
+      archetypes: card.archetypes,
+    };
+  });
+
+  const valueFiltered = rawResult.filter(x => x.value > 0);
+  const potentialFiltered = rawResult.filter(x => x.potential > 0);
+
+  const meanValue =
+    valueFiltered.reduce((sum, x) => sum + x.value, 0) / valueFiltered.length;
+  const stdevValue = Math.sqrt(
+    valueFiltered.reduce(
+      (sum, x) => sum + (meanValue - x.value) * (meanValue - x.value),
+      0,
+    ) /
+      (valueFiltered.length - 1),
+  );
+  const meanPotential =
+    potentialFiltered.reduce((sum, x) => sum + x.potential, 0) /
+    potentialFiltered.length;
+  const stdevPotential = Math.sqrt(
+    potentialFiltered.reduce(
+      (sum, x) =>
+        sum + (meanPotential - x.potential) * (meanPotential - x.potential),
+      0,
+    ) /
+      (potentialFiltered.length - 1),
+  );
+
+  return rawResult.reduce(
+    (obj, card) => {
+      const value =
+        card.value > 0 ? (card.value - meanValue) / stdevValue * 15 + 55 : 0;
+      const potential =
+        card.potential > 0
+          ? (card.potential - meanPotential) / stdevPotential * 15 + 55
+          : 0;
+      return {
+        ...obj,
+        [card.cardCode]: {
+          value: value.toString(),
+          potential: potential.toString(),
+          archetypes: card.archetypes,
+        },
+      };
+    },
+    {} as {
+      [cardCode: string]: { value: string; potential: string; archetypes: any };
+    },
+  );
+}
+
+interface CardPopularity {
   dbf_id: number;
   popularity: number;
   winrate: number;
@@ -112,24 +231,36 @@ interface HSReplayData {
   decks: number;
 }
 
-interface HSReplayResponse {
+interface ArchetypePopularity {
+  archetype_id: number;
+  pct_of_class: number;
+  pct_of_total: number;
+  total_games: number;
+  win_rate: number;
+}
+
+interface HSReplayResponse<T> {
   as_of: string;
   render_as: string;
   series: {
-    metadata: {
-      total_played_decks_count: number;
-    };
-    data: {
-      ALL: HSReplayData[];
-      DRUID: HSReplayData[];
-      HUNTER: HSReplayData[];
-      MAGE: HSReplayData[];
-      PALADIN: HSReplayData[];
-      PRIEST: HSReplayData[];
-      ROGUE: HSReplayData[];
-      SHAMAN: HSReplayData[];
-      WARLOCK: HSReplayData[];
-      WARRIOR: HSReplayData[];
-    };
+    data: { [key in PlayerClass | 'ALL']: T[] };
+  };
+}
+
+interface ArchetypeDetail {
+  id: number;
+  name: string;
+  player_class: number;
+  player_class_name: PlayerClass;
+  url: string;
+  standard_signature: {
+    as_of: string;
+    format: number;
+    components: [number, number][];
+  };
+  wild_signature: {};
+  sankey_visualization: {
+    links: { source: string; target: string; value: number }[];
+    nodes: { name: string }[];
   };
 }
