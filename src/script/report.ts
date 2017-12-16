@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { createConnection } from 'typeorm';
+import { createConnection, Repository } from 'typeorm';
 
 import * as Config from '../config';
-import { HSReplayStatEntity } from '../core';
+import { HSReplayStatEntity, JudgeEntity, UploadEntity } from '../core';
 import { hsreplayMap } from './hsreplay';
 
 const UPDATE_INTERVAL = 1000 * 60 * 5;
@@ -78,7 +78,10 @@ async function run() {
     }, []);
 
     const connection = await createConnection(Config.pgConfig);
-    await connection.getRepository(HSReplayStatEntity).save(hsreplayStats);
+    await connection.transaction(async tx => {
+      await connection.getRepository(HSReplayStatEntity).save(hsreplayStats);
+      await calculateScores(tx.getRepository(UploadEntity));
+    });
     await connection.close();
 
     console.log('inserted');
@@ -90,6 +93,53 @@ async function run() {
 }
 
 run();
+
+async function calculateScores(repo: Repository<UploadEntity>) {
+  const uploads = <({
+    judges: ({ hsreplay: HSReplayStatEntity } & JudgeEntity)[];
+  } & UploadEntity)[]>await repo
+    .createQueryBuilder('upload')
+    .leftJoinAndSelect('upload.judges', 'judges')
+    .leftJoinAndMapOne(
+      'judges.hsreplay',
+      HSReplayStatEntity,
+      'hsreplay',
+      'hsreplay.cardCode = judges.cardCode',
+    )
+    .getMany();
+  const scores = uploads
+    .map(upload => {
+      return {
+        id: upload.id,
+        count: upload.judges.length,
+        score: (
+          720 / 7 -
+          upload.judges.reduce(
+            (sum, judge) =>
+              sum +
+              (judge.value - +judge.hsreplay.value) *
+                (judge.value - +judge.hsreplay.value) +
+              (judge.potential - +judge.hsreplay.potential) *
+                (judge.potential - +judge.hsreplay.potential),
+            0,
+          ) /
+            upload.judges.length /
+            17.5
+        ).toString(),
+        rank: <number | null>null,
+      };
+    })
+    .sort((a, b) => +b.score - +a.score);
+
+  let rank = 1;
+  scores.forEach(score => {
+    if (score.count >= 100) {
+      score.rank = rank;
+      rank += 1;
+    }
+  });
+  return repo.save(scores);
+}
 
 async function getTransformedData() {
   const archetypePopularity: HSReplayResponse<ArchetypePopularity> = await axios
@@ -203,11 +253,11 @@ async function getTransformedData() {
   return rawResult.reduce(
     (obj, card) => {
       const value =
-        card.value > 0 ? (card.value - meanValue) / stdevValue * 15 + 55 : 0;
+        card.value > 0 ? (card.value - meanValue) / stdevValue * 15 + 55 : 20;
       const potential =
         card.potential > 0
           ? (card.potential - meanPotential) / stdevPotential * 15 + 55
-          : 0;
+          : 20;
       return {
         ...obj,
         [card.cardCode]: {

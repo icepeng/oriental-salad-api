@@ -1,8 +1,13 @@
 import { Service } from 'typedi';
 import { EntityManager } from 'typeorm';
-import { calculateStats } from '../../util/stat';
 
-import { CardEntity, CardStatEntity, JudgeEntity } from '../../core';
+import {
+  CardEntity,
+  CardStatEntity,
+  HSReplayStatEntity,
+  JudgeEntity,
+} from '../../core';
+import { calculateStats } from '../../util/stat';
 import { NotFoundError } from '../error';
 import { CARD_LIST } from './cards';
 import { Card, toCard, toCardEntity } from './dto';
@@ -140,6 +145,44 @@ export class CardService {
       .limit(1)
       .getOne();
 
+    const mostAccurateJudge = await judgeRepo
+      .createQueryBuilder('judge')
+      .leftJoinAndSelect('judge.upload', 'upload')
+      .leftJoin(
+        HSReplayStatEntity,
+        'hsreplayStat',
+        'hsreplayStat.cardCode = judge.cardCode',
+      )
+      .where('judge.cardCode = :cardCode', { cardCode })
+      .andWhere('char_length(judge.description) > 0')
+      .orderBy(
+        `(judge.value - hsreplayStat.value) * (judge.value - hsreplayStat.value) +
+        (judge.potential - hsreplayStat.potential) * (judge.potential - hsreplayStat.potential)`,
+        'ASC',
+      )
+      .addOrderBy('random()')
+      .limit(1)
+      .getOne();
+
+    const mostWrongJudge = await judgeRepo
+      .createQueryBuilder('judge')
+      .leftJoinAndSelect('judge.upload', 'upload')
+      .leftJoin(
+        HSReplayStatEntity,
+        'hsreplayStat',
+        'hsreplayStat.cardCode = judge.cardCode',
+      )
+      .where('judge.cardCode = :cardCode', { cardCode })
+      .andWhere('char_length(judge.description) > 0')
+      .orderBy(
+        `(judge.value - hsreplayStat.value) * (judge.value - hsreplayStat.value) +
+              (judge.potential - hsreplayStat.potential) * (judge.potential - hsreplayStat.potential)`,
+        'DESC',
+      )
+      .addOrderBy('random()')
+      .limit(1)
+      .getOne();
+
     const maxPotentialJudge = await judgeRepo
       .createQueryBuilder('judge')
       .leftJoinAndSelect('judge.upload', 'upload')
@@ -173,6 +216,8 @@ export class CardService {
       minValueJudge,
       maxPotentialJudge,
       minPotentialJudge,
+      mostAccurateJudge,
+      mostWrongJudge,
       longestJudge,
     };
   }
