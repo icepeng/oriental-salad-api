@@ -3,6 +3,11 @@ import { JudgeEntity, UploadEntity } from '../../core';
 export class Upload {
   name: string;
   judges: Judge[];
+}
+
+export class UploadResult {
+  name: string;
+  judges: Judge[];
   score: string | null;
   rank: number | null;
 }
@@ -41,9 +46,9 @@ export function toJudgeEntity(judge: Judge, uploadId: string): JudgeEntity {
   };
 }
 
-export function toUpload(
+export function toUploadResult(
   upload: { judges: JudgeEntity[] } & UploadEntity,
-): Upload {
+): UploadResult {
   return {
     name: upload.name,
     judges: upload.judges.map(item => this.toJudge(item)),

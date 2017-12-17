@@ -3,7 +3,7 @@ import { EntityManager } from 'typeorm';
 
 import { JudgeEntity, UploadEntity } from '../../core';
 import { NotFoundError } from '../error';
-import { toJudgeEntity, toUpload, toUploadEntity, Upload } from './dto';
+import { toJudgeEntity, toUploadEntity, toUploadResult, Upload } from './dto';
 
 @Service()
 export class UploadService {
@@ -19,7 +19,7 @@ export class UploadService {
     if (!upload) {
       throw new NotFoundError();
     }
-    return toUpload(upload);
+    return toUploadResult(upload);
   }
 
   public async findByName(entityManager: EntityManager, name: string) {
@@ -55,10 +55,23 @@ export class UploadService {
   }
 
   public async getStats(entityManager: EntityManager) {
-    // const uploads = entityManager
-    //   .getRepository(UploadEntity)
-    //   .createQueryBuilder('upload')
-    //   .leftJoinAndSelect('upload.judges', 'judge')
-    //   .getMany();
+    const bestUploads = await entityManager
+      .getRepository(UploadEntity)
+      .createQueryBuilder('upload')
+      .where('upload.rank is not null')
+      .orderBy('upload.rank', 'ASC')
+      .take(3)
+      .getMany();
+    const worstUploads = await entityManager
+      .getRepository(UploadEntity)
+      .createQueryBuilder('upload')
+      .where('upload.rank is not null')
+      .orderBy('upload.rank', 'DESC')
+      .take(3)
+      .getMany();
+    return {
+      bestUploads,
+      worstUploads,
+    };
   }
 }
