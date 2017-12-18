@@ -7,6 +7,25 @@ import { toJudgeEntity, toUploadEntity, toUploadResult, Upload } from './dto';
 
 @Service()
 export class UploadService {
+  public async getAll(entityManager: EntityManager) {
+    return entityManager
+      .getRepository(UploadEntity)
+      .createQueryBuilder('upload')
+      .addSelect('count(judge.id) as judge_count')
+      .leftJoin('upload.judges', 'judge')
+      .groupBy('upload.id')
+      .getRawMany()
+      .then(res =>
+        res.map(x => ({
+          id: x.upload_id,
+          name: x.upload_name,
+          score: x.upload_score,
+          rank: x.upload_rank,
+          judgeCount: x.judge_count,
+        })),
+      );
+  }
+
   public async getOne(
     entityManager: EntityManager,
     id: string,

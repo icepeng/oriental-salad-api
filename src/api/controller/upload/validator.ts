@@ -42,13 +42,3 @@ export function idValidator(id: string): Validation<string> {
   const schema = Joi.string().uuid();
   return Joi.validate(id, schema, { language: LANG_KO });
 }
-
-export function nameValidator(body: any): Validation<{ name: string }> {
-  const schema = Joi.object().keys({
-    name: Joi.string()
-      .max(255)
-      .required(),
-  });
-
-  return Joi.validate(body, schema, { language: LANG_KO });
-}
