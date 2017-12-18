@@ -6,6 +6,7 @@
     "start": "npm run build:live",
     "start:report": "./node_modules/.bin/ts-node ./src/script/report.ts",
     "start:generate": "./node_modules/.bin/ts-node ./src/script/generate.ts",
+    "start:clean": "./node_modules/.bin/ts-node ./src/script/cleaner.ts",
     "build": "./node_modules/.bin/tsc",
     "build:live": "nodemon --exec ./node_modules/.bin/ts-node -r tsconfig-paths/register -- ./src/index.ts",
     "build:dry": "./node_modules/.bin/tsc --noEmit",
