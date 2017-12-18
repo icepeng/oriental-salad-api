@@ -88,36 +88,49 @@ export class CardService {
   }
 
   public async getStatTotal(entityManager: EntityManager) {
-    const cardsWithStat = await entityManager
-      .getRepository(CardEntity)
-      .find({ relations: ['hsreplayStat', 'stat'] });
+    const getStats = () =>
+      entityManager
+        .getRepository(CardStatEntity)
+        .createQueryBuilder('cardStat')
+        .leftJoinAndMapOne(
+          'cardStat.hsreplay',
+          HSReplayStatEntity,
+          'hsreplay',
+          'hsreplay.cardCode = cardStat.cardCode',
+        )
+        .getMany();
+
+    let stats: ({
+      hsreplay?: HSReplayStatEntity;
+    } & CardStatEntity)[] = await getStats();
+
+    if (stats.length === 0) {
+      await this.saveStats(entityManager);
+      stats = await getStats();
+    }
 
     try {
-      return cardsWithStat.map(card => {
-        if (!card.stat) {
-          throw new NotFoundError();
-        }
-        if (!card.hsreplayStat) {
-          return card.stat;
+      return stats.map(stat => {
+        if (!stat.hsreplay) {
+          return stat;
         }
         return {
-          ...card.stat,
+          ...stat,
           hsreplay: {
-            winRate: card.hsreplayStat.winRate,
-            popularity: card.hsreplayStat.popularityAll,
-            popularityClass: card.hsreplayStat.popularityClass,
-            value: card.hsreplayStat.value,
-            potential: card.hsreplayStat.potential,
+            winRate: stat.hsreplay.winRate,
+            popularity: stat.hsreplay.popularityAll,
+            popularityClass: stat.hsreplay.popularityClass,
+            value: stat.hsreplay.value,
+            potential: stat.hsreplay.potential,
             archetypes:
-              typeof card.hsreplayStat.archetypes === 'string'
-                ? JSON.parse(<any>card.hsreplayStat.archetypes)
-                : card.hsreplayStat.archetypes,
+              typeof stat.hsreplay.archetypes === 'string'
+                ? JSON.parse(<any>stat.hsreplay.archetypes)
+                : stat.hsreplay.archetypes,
             // TODO: remove JSON.parse when typeorm bug fixed
           },
         };
       });
     } catch (err) {
-      await this.saveStats(entityManager);
       throw err;
     }
   }
